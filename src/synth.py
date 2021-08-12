@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 from __future__ import print_function
 import subprocess, sys, argparse
@@ -74,6 +74,8 @@ method2 = args.method2
 PredicatesFilename = args.predicates
 
 verbosity = default_verbosity + len(args.verbose) - len(args.quiet)
+
+print(args.quiet)
 
 if verbosity >= 1:
     print(" * * * " + AbstractFilename + " " + method1 + " " + method2 + " * * * ")
