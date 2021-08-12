@@ -146,7 +146,7 @@ def fileToSpec(file):
     """Take specification specified in a YML file, and convert to
     internal data structures."""
 
-    stream = open(file, 'r') if file is not None else sys.stdin
+    stream = open(file, 'r') if file is not None and file != "-" else sys.stdin
     return Specification(yaml.load(stream))
 
 def StateVar(s, varname):
