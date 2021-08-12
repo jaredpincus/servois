@@ -75,8 +75,6 @@ PredicatesFilename = args.predicates
 
 verbosity = default_verbosity + len(args.verbose) - len(args.quiet)
 
-print(args.quiet)
-
 if verbosity >= 1:
     print(" * * * " + AbstractFilename + " " + method1 + " " + method2 + " * * * ")
 
