@@ -38,9 +38,9 @@ class Specification:
         self.methods = [ Method(m["name"],
                                 m["args"],
                                 m["return"],
-                                m["requires"],
+                                m.get("requires", "true"),
                                 m["ensures"],
-                                m["terms"] if "terms" in m else [])
+                                m.get("terms", []))
                          for m in spec["methods"] ]
     def getPreamble(self):
         if "preamble" in self.spec:

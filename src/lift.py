@@ -18,7 +18,7 @@ def liftSpec(old_spec):
     spec["states_equal"]["definition"] = "(or (and err_1 err_2) (and (not err_1) (not err_2)\n" + se + "\n))"
 
     for m in spec["methods"]:
-        req = m["requires"]
+        req = m.get("requires", "true")
         ens = m["ensures"]
         m["requires"] = "true"
         m["ensures"] = ("(or (and err err_new)\n" +
