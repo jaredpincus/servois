@@ -50,6 +50,10 @@ parser.add_argument('-q','--quiet',
     help='Be quieter',
     action="append_const",dest="quiet",const=True,default=[]
 )
+parser.add_argument('-qq','--quieter',
+    help='Be even more quiet',
+    action="append_const",dest="quieter",const=True,default=[]
+)
 parser.add_argument('--check', choices=['bowtie', 'deterministic', 'complete', 'leftmover', 'rightmover'],
                     dest="check", default="bowtie")
 parser.add_argument('--cvc4args',  dest="cvc4args", default="")
@@ -73,7 +77,7 @@ method1 = args.method1
 method2 = args.method2
 PredicatesFilename = args.predicates
 
-verbosity = default_verbosity + len(args.verbose) - len(args.quiet)
+verbosity = default_verbosity + len(args.verbose) - len(args.quiet) - 2 * len(args.quieter)
 
 if verbosity >= 1:
     print(" * * * " + AbstractFilename + " " + method1 + " " + method2 + " * * * ")
@@ -224,7 +228,7 @@ else:
     if verbosity >= 1: print("Skipping automatic predicate generation.")
 
 if len(predicates) == 0:
-    print("ERROR: no predicates.")
+    if verbosity >= 0: print("ERROR: no predicates.")
     sys.exit(1)
 
 ########################################
@@ -250,7 +254,7 @@ def current_precondition():
     # ret = '(or '+' '.join(or_regions)+')' if len(or_regions) > 1 else or_regions[0]
     ret = nary('or', or_regions)
     if answer_complete == False:
-        print("Warning: Incomplete.")
+        if verbosity >= 0: print("Warning: Incomplete.")
         and_regions = [ret] + ['(not '+('(and '+' '.join(s)+')' if len(s) > 1 else s[0])+')' for s in bottom]
         ret = '(and '+' '.join(and_regions)+')'
     return ret
@@ -275,8 +279,9 @@ def filterPredicates(predicates):
     out, err = p.communicate(fullinput)
     outlines=out.split()
     if len(outlines) != len(predicates)*2:
-        print("Input:"+fullinput+"\nOut:\n" + out + "\nErr:\n" + err)
-        print("Something went wrong. filterPredicates exit point A.")
+        if verbosity >= 0: 
+            print("Input:"+fullinput+"\nOut:\n" + out + "\nErr:\n" + err)
+            print("Something went wrong. filterPredicates exit point A.")
         exit(1)
     return [predicates[i] for i in range(len(predicates))
             if outlines[2*i]=="sat" and outlines[2*i+1]=="sat"]
@@ -330,7 +335,7 @@ def valid(formula, getvalue=[], getvalue_result={}):
         return True
     elif(len(outlines) > 0 and outlines[0] == "sat"):
         if p.returncode != 0:
-            print("Out:\n" + out + "\nErr:\n" + err)
+            if verbosity >= 0: print("Out:\n" + out + "\nErr:\n" + err)
             sys.exit(1)
 
         for i in range(len(outlines[1:])):
@@ -341,12 +346,12 @@ def valid(formula, getvalue=[], getvalue_result={}):
             elif "true)" in out:
                 getvalue_result[pred] = "true"
             else:
-                print("Exit at error point A in valid()")
+                if verbosity >= 0: print("Exit at error point A in valid()")
     else:
         if p.returncode != 0:
-            print("Out:\n" + out + "\nErr:\n" + err)
+            if verbosity >= 0: print("Out:\n" + out + "\nErr:\n" + err)
             sys.exit(1)
-        print("Exit at error point B in valid()")
+        if verbosity >= 0: print("Exit at error point B in valid()")
     return (out == "unsat\n")
 
 def ret_from_1_and_2(p, ret1, ret2):
@@ -425,7 +430,7 @@ def synth(H, i, poke=False):
     #print(interesting_indices)
 
     if len(predicates) == i:
-        print("Couldn't finish: ", H)
+        if verbosity >= 0: print("Couldn't finish: ", H)
         answer_complete = False
         return ["false", "false"]
 
